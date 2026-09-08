@@ -1,0 +1,19 @@
+{
+  "dataset": "GBC",
+  "split": "Val",
+  "total_validation_slices": 2030,
+  "positive_target_slices": 846,
+  "empty_target_slices": 1184,
+  "evaluated_slices": 846,
+  "mean_dice": 0.5543689191318407,
+  "median_dice": 0.5873424768432184,
+  "std_dice": 0.24108589003593145,
+  "mean_iou": 0.4221112798564948,
+  "median_iou": 0.4157715272388545,
+  "std_iou": 0.23454111202100514,
+  "mean_precision": 0.6089311024823562,
+  "mean_recall": 0.5832149951760147,
+  "min_dice": 0.0037593984962406013,
+  "max_dice": 0.9686650617379825,
+  "runtime_seconds": 935.1356353759766
+}
