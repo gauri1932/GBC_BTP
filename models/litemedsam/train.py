@@ -203,6 +203,10 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Device: {device}")
 
+    if device.type == "cuda":
+        # Fixed 256x256 input -> autotune conv kernels once.
+        torch.backends.cudnn.benchmark = True
+
     # --------------------------------------------------------
     # Data
     # --------------------------------------------------------
@@ -214,11 +218,11 @@ def main():
 
     train_loader = DataLoader(
         train_set, batch_size=args.batch_size, shuffle=True,
-        num_workers=0,
+        num_workers=4, pin_memory=True,
     )
     val_loader = DataLoader(
         val_set, batch_size=args.batch_size, shuffle=False,
-        num_workers=0,
+        num_workers=4, pin_memory=True,
     )
 
     # --------------------------------------------------------
