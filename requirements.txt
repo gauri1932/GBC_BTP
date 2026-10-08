@@ -6,3 +6,5 @@ scipy
 matplotlib
 scikit-learn
 torch
+timm            # LiteMedSAM TinyViT encoder only
+gdown           # official lite_medsam.pth download only

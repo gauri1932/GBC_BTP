@@ -13,6 +13,7 @@ gbc/                  shared library (model-agnostic)
 models/
   _template/          skeleton for a new model (prep/train/evaluate)
   medsam/             MedSAM plug-in: prep.py, train.py, evaluate.py
+  litemedsam/         LiteMedSAM plug-in (TinyViT, same preprocessed data)
 scripts/              runnable pipeline steps (run from repo root)
   make_split.py       patient-level Train/Val split (one-time)
   analyze_dataset.py  full EDA report (read-only)
