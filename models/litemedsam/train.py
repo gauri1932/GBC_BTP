@@ -158,13 +158,16 @@ def dice_iou(pred, target):
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--epochs", type=int, default=10)
-    parser.add_argument("--batch-size", type=int, default=8)
+    parser.add_argument("--epochs", type=int, default=None)
+    parser.add_argument("--batch-size", type=int, default=None)
+    parser.add_argument("--quick", action="store_true",
+                        help="Fast validation run: 2 epochs, 400 train / "
+                             "100 val samples, batch 16.")
     parser.add_argument("--lr", type=float, default=5e-5)
     parser.add_argument("--weight-decay", type=float, default=0.01)
     parser.add_argument("--bbox-shift", type=int, default=5)
     parser.add_argument("--max-train", type=int, default=None)
-    parser.add_argument("--max-val", type=int, default=500)
+    parser.add_argument("--max-val", type=int, default=None)
     parser.add_argument("--pretrained", default=str(PRETRAINED),
                         help="lite_medsam.pth path (auto-downloaded).")
     parser.add_argument("--from-scratch", action="store_true")
@@ -176,6 +179,22 @@ def parse_args():
 
 def main():
     args = parse_args()
+
+    # Resolve presets: --quick gives a minutes-long validation run,
+    # explicit flags always win over presets.
+    if args.quick:
+        args.epochs = 2 if args.epochs is None else args.epochs
+        args.batch_size = (
+            16 if args.batch_size is None else args.batch_size
+        )
+        args.max_train = 400 if args.max_train is None else args.max_train
+        args.max_val = 100 if args.max_val is None else args.max_val
+        print("QUICK MODE: 2 epochs, 400 train / 100 val, batch 16 "
+              "(override with explicit flags)")
+
+    args.epochs = 10 if args.epochs is None else args.epochs
+    args.batch_size = 8 if args.batch_size is None else args.batch_size
+    args.max_val = 500 if args.max_val is None else args.max_val
 
     random.seed(42)
     np.random.seed(42)
