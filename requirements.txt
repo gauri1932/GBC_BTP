@@ -1,0 +1,8 @@
+# Shared environment for all models (medsam_env satisfies this).
+numpy
+pillow
+tqdm
+scipy
+matplotlib
+scikit-learn
+torch

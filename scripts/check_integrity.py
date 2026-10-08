@@ -1,12 +1,17 @@
 from pathlib import Path
 import re
+import sys
 
+REPO_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO_ROOT))
 
-# ============================================================
-# PATHS
-# ============================================================
+from gbc.config import DATASET_DIR
 
-BASE_DIR = Path(r"C:\Users\Student\Downloads\GBC\GBC_dataset")
+# Windows consoles default to cp1252, which cannot print ✓/⚠.
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
+BASE_DIR = DATASET_DIR
 
 ORIGINAL_TRAIN = BASE_DIR / "Train"
 ORIGINAL_TEST = BASE_DIR / "Test"

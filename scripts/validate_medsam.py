@@ -16,8 +16,14 @@
 #
 # ============================================================
 
-import gbc_preprocess as P
-import gbc_medsam as M
+import sys
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO_ROOT))
+
+from gbc import data as P
+from models.medsam import prep as M
 
 
 def main():

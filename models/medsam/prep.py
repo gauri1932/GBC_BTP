@@ -19,7 +19,8 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-import gbc_preprocess as P
+from gbc import data as P
+from gbc.config import DATASET_DIR, TARGET_LABELS
 
 
 # ============================================================
@@ -29,17 +30,15 @@ import gbc_preprocess as P
 # MedSAM ViT-B encoder input resolution.
 MEDSAM_SIZE = (1024, 1024)
 
-# Segmentation target: gallbladder mass + wall thickening.
-TARGET_LABELS = {1, 2}
-
+# Segmentation target + names live in gbc.config (shared with EDA).
 LABEL_NAMES = {
     1: "Gallbladder Mass",
     2: "Gallbladder Wall Thickening",
 }
 
-# Outputs (same layout the stage17-19 code already consumes).
-IMAGE_ROOT = P.ROOT / "medsam_preprocessed"
-TARGET_ROOT = P.ROOT / "medsam_targets"
+# Outputs (same layout the train/eval code consumes).
+IMAGE_ROOT = DATASET_DIR / "medsam_preprocessed"
+TARGET_ROOT = DATASET_DIR / "medsam_targets"
 
 
 # ============================================================

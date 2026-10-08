@@ -21,14 +21,18 @@
 
 import argparse
 import csv
+import sys
 from pathlib import Path
 
 from tqdm import tqdm
 
-import gbc_preprocess as P
+REPO_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO_ROOT))
 
+from gbc import data as P
+from gbc.config import REPO_ROOT as REPO
 
-ROOT = Path(r"C:\Users\Student\Downloads\GBC")
+ROOT = REPO
 OUTPUT_BASE = ROOT / "cls_data"
 
 CLS_SIZE = (256, 256)

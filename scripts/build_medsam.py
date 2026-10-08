@@ -20,11 +20,16 @@
 # ============================================================
 
 import argparse
+import sys
+from pathlib import Path
 
 from tqdm import tqdm
 
-import gbc_preprocess as P
-import gbc_medsam as M
+REPO_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO_ROOT))
+
+from gbc import data as P
+from models.medsam import prep as M
 
 
 def build_split(split_name):

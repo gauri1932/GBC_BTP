@@ -19,29 +19,17 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
+from gbc.config import (
+    CLASS_BITS,
+    DATASET_DIR,
+    N_LABEL_BITS,
+    ORIGINAL_SIZE,
+    SPLIT_DIRS,
+)
 
-# ============================================================
-# DATASET LAYOUT
-# ============================================================
 
-ROOT = Path(r"C:\Users\Student\Downloads\GBC\GBC_dataset")
-
-# Native acquisition resolution (grayscale INP, multiclass GT).
-ORIGINAL_SIZE = (512, 512)
-
-# Splits with INP / GT / LABEL triplets.
-# NOTE: Train/Val come from the patient-level stage7 split,
-# Test is the untouched official test set.
-SPLIT_DIRS = {
-    "Train": ROOT / "split" / "Train",
-    "Val": ROOT / "split" / "Val",
-    "Test": ROOT / "Test",
-}
-
-# Classification attributes: LABEL files hold 9 bits,
-# bit 0 is always 1, bits 1..8 are the real attributes.
-N_LABEL_BITS = 9
-CLASS_BITS = list(range(1, 9))
+# Backwards-compatible aliases (old flat-module names).
+ROOT = DATASET_DIR
 
 
 # ============================================================

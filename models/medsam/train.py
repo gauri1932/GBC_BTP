@@ -1,6 +1,9 @@
 import os
+import sys
 import json
 import random
+from pathlib import Path
+
 import numpy as np
 from PIL import Image
 from tqdm import tqdm
@@ -9,44 +12,33 @@ import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+sys.path.insert(0, str(REPO_ROOT))
+
 from segment_anything import sam_model_registry
 
+from models.medsam import prep as M
+
 
 # ============================================================
-# STAGE 19 - MEDSAM FINE-TUNING
+# MEDSAM FINE-TUNING (old stage19, paths via gbc + prep)
 # ============================================================
 
-ROOT = r"C:\Users\Student\Downloads\GBC"
+TRAIN_IMG = str(M.IMAGE_ROOT / "Train" / "INP")
 
-TRAIN_IMG = os.path.join(
-    ROOT, "GBC_dataset", "medsam_preprocessed", "Train", "INP"
-)
+TRAIN_MASK = str(M.TARGET_ROOT / "Train" / "GT_binary")
 
-TRAIN_MASK = os.path.join(
-    ROOT, "GBC_dataset", "medsam_targets", "Train", "GT_binary"
-)
+TRAIN_BOX = str(M.TARGET_ROOT / "Train" / "boxes.json")
 
-TRAIN_BOX = os.path.join(
-    ROOT, "GBC_dataset", "medsam_targets", "Train", "boxes.json"
-)
+VAL_IMG = str(M.IMAGE_ROOT / "Val" / "INP")
 
-VAL_IMG = os.path.join(
-    ROOT, "GBC_dataset", "medsam_preprocessed", "Val", "INP"
-)
+VAL_MASK = str(M.TARGET_ROOT / "Val" / "GT_binary")
 
-VAL_MASK = os.path.join(
-    ROOT, "GBC_dataset", "medsam_targets", "Val", "GT_binary"
-)
+VAL_BOX = str(M.TARGET_ROOT / "Val" / "boxes.json")
 
-VAL_BOX = os.path.join(
-    ROOT, "GBC_dataset", "medsam_targets", "Val", "boxes.json"
-)
+CHECKPOINT = str(REPO_ROOT / "checkpoints" / "medsam_vit_b.pth")
 
-CHECKPOINT = os.path.join(
-    ROOT, "checkpoints", "medsam_vit_b.pth"
-)
-
-OUTPUT = os.path.join(ROOT, "stage19_results")
+OUTPUT = str(Path(__file__).resolve().parent / "outputs")
 os.makedirs(OUTPUT, exist_ok=True)
 
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")

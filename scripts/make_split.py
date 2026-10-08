@@ -2,13 +2,14 @@ from pathlib import Path
 import re
 import random
 import shutil
+import sys
 
-# ============================================================
-# PATHS
-# ============================================================
+REPO_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO_ROOT))
 
-BASE_DIR = Path(r"C:\Users\Student\Downloads\GBC\GBC_dataset")
+from gbc.config import DATASET_DIR
 
+BASE_DIR = DATASET_DIR
 TRAIN_DIR = BASE_DIR / "Train"
 
 INP_DIR = TRAIN_DIR / "INP"
