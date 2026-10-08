@@ -162,7 +162,7 @@ def parse_args():
     parser.add_argument("--batch-size", type=int, default=None)
     parser.add_argument("--quick", action="store_true",
                         help="Fast validation run: 2 epochs, 400 train / "
-                             "100 val samples, batch 16.")
+                             "100 val samples, batch 8.")
     parser.add_argument("--lr", type=float, default=5e-5)
     parser.add_argument("--weight-decay", type=float, default=0.01)
     parser.add_argument("--bbox-shift", type=int, default=5)
@@ -185,11 +185,11 @@ def main():
     if args.quick:
         args.epochs = 2 if args.epochs is None else args.epochs
         args.batch_size = (
-            16 if args.batch_size is None else args.batch_size
+            8 if args.batch_size is None else args.batch_size
         )
         args.max_train = 400 if args.max_train is None else args.max_train
         args.max_val = 100 if args.max_val is None else args.max_val
-        print("QUICK MODE: 2 epochs, 400 train / 100 val, batch 16 "
+        print("QUICK MODE: 2 epochs, 400 train / 100 val, batch 8 "
               "(override with explicit flags)")
 
     args.epochs = 10 if args.epochs is None else args.epochs
@@ -247,6 +247,14 @@ def main():
         optimizer, mode="min", factor=0.9, patience=5
     )
 
+    # Mixed precision: halves activation memory (fits 4GB GPUs).
+    # No-op on CPU.
+    use_amp = device.type == "cuda"
+    scaler = torch.amp.GradScaler("cuda") if use_amp else None
+    if use_amp:
+        torch.cuda.empty_cache()
+        print("AMP (float16) enabled")
+
     start_epoch, best_dice = 1, -1.0
     if args.resume:
         state = torch.load(args.resume, map_location="cpu")
@@ -266,11 +274,17 @@ def main():
             image, mask, box = (
                 image.to(device), mask.to(device), box.to(device)
             )
-            logits, _ = model(image, box)
-            loss = combined_loss(logits, mask)
-            loss.backward()
-            optimizer.step()
-            optimizer.zero_grad()
+            optimizer.zero_grad(set_to_none=True)
+            with torch.amp.autocast("cuda", enabled=use_amp):
+                logits, _ = model(image, box)
+                loss = combined_loss(logits, mask)
+            if use_amp:
+                scaler.scale(loss).backward()
+                scaler.step(optimizer)
+                scaler.update()
+            else:
+                loss.backward()
+                optimizer.step()
             print(f"batch {step}: loss={loss.item():.4f} "
                   f"logits {tuple(logits.shape)}")
             if step >= 4:
@@ -295,13 +309,23 @@ def main():
             box = box.to(device)
 
             optimizer.zero_grad(set_to_none=True)
-            logits, _ = model(image, box)
-            loss = combined_loss(logits, mask)
-            loss.backward()
-            torch.nn.utils.clip_grad_norm_(
-                model.parameters(), max_norm=1.0
-            )
-            optimizer.step()
+            with torch.amp.autocast("cuda", enabled=use_amp):
+                logits, _ = model(image, box)
+                loss = combined_loss(logits, mask)
+            if use_amp:
+                scaler.scale(loss).backward()
+                scaler.unscale_(optimizer)
+                torch.nn.utils.clip_grad_norm_(
+                    model.parameters(), max_norm=1.0
+                )
+                scaler.step(optimizer)
+                scaler.update()
+            else:
+                loss.backward()
+                torch.nn.utils.clip_grad_norm_(
+                    model.parameters(), max_norm=1.0
+                )
+                optimizer.step()
             running += loss.item()
 
         train_loss = running / max(len(train_loader), 1)
