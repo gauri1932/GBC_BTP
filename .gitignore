@@ -70,7 +70,9 @@ Thumbs.db
 *.ckpt
 *.onnx
 
-# MedSAM checkpoints
+# Model weights / checkpoints (model CODE stays tracked)
 checkpoints/
 weights/
-models/
+
+# Per-model run outputs (figures, predictions, local checkpoints)
+models/*/outputs/
